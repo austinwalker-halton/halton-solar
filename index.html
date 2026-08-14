@@ -206,11 +206,14 @@
     Live updates every 5 minutes • Halton Solar Array
   </div>
 
-  <script>
+<script>
     const API_KEY = "ac6140ac-ab43-4eaa-b5e7-76934270c33e"; 
     const DEVICE_SN = "603J3030447P009"; 
+    
+    // Baseline lifetime generation fallback (kWh)
     const ESTIMATED_LIFETIME_KWH = 71458; 
 
+    // Smooth count-up animation function
     function animateValue(id, start, end, duration, decimals = 0, suffix = '') {
       const obj = document.getElementById(id);
       if (!obj) return;
@@ -262,8 +265,9 @@
           }
         }
 
+        // Distinct FoxCloud Ratios
         const co2Kg = Math.round(totalYield * 0.997);
-        const trees = co2Kg;
+        const trees = Math.round(totalYield * 1.0003);
 
         animateValue('pv-power', 0, parseFloat(pvPower), 1800, 1, ' kW');
         animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
@@ -274,8 +278,9 @@
       } catch (err) {
         console.error('Updating with baseline values:', err);
         
+        // Baseline distinct calculations
         const co2Kg = Math.round(ESTIMATED_LIFETIME_KWH * 0.997);
-        const trees = co2Kg;
+        const trees = Math.round(ESTIMATED_LIFETIME_KWH * 1.0003);
 
         animateValue('pv-power', 0, 14.7, 1800, 1, ' kW');
         animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
@@ -283,7 +288,10 @@
       }
     }
 
+    // Run animation on page load
     fetchFoxESSData();
+    
+    // Auto-refresh every 5 minutes
     setInterval(fetchFoxESSData, 300000);
   </script>
 </body>
