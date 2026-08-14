@@ -3,74 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Halton Tennis Solar Dashboard</title>
+  <title>Halton Outdoor Centre - Project Zero Dashboard</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: #0b1329;
-      color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f4f6f8;
+      color: #0b2b3c;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 50px;
+      padding: 40px;
       overflow: hidden;
     }
     
+    /* Top Header Bar */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #1e293b;
-      padding-bottom: 25px;
+      background: #ffffff;
+      padding: 20px 35px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(11, 43, 60, 0.08);
+      border-left: 10px solid #88c542;
     }
-    .header h1 { font-size: 46px; font-weight: 700; color: #f8fafc; }
+    .header-titles {
+      display: flex;
+      flex-direction: column;
+    }
+    .header h1 { 
+      font-size: 38px; 
+      font-weight: 800; 
+      color: #0b2b3c; 
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+    .header h1 span {
+      color: #88c542;
+    }
+    .header .subtitle {
+      font-size: 18px;
+      color: #5c727d;
+      font-weight: 600;
+      margin-top: 4px;
+    }
     .status-badge {
-      background-color: #065f46;
-      color: #34d399;
-      padding: 10px 24px;
+      background-color: #eaf6de;
+      color: #4b801a;
+      border: 2px solid #88c542;
+      padding: 10px 22px;
       border-radius: 30px;
       font-weight: 700;
-      font-size: 22px;
+      font-size: 20px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
+    /* Main Cards Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 35px;
+      gap: 30px;
       margin: auto 0;
     }
 
     .card {
-      background: #1e293b;
+      background: #ffffff;
       border-radius: 24px;
-      padding: 45px 30px;
+      padding: 40px 25px;
       text-align: center;
-      border: 1px solid #334155;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 15px 35px rgba(11, 43, 60, 0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .card .icon { font-size: 72px; margin-bottom: 20px; }
-    .card .value { font-size: 70px; font-weight: 800; color: #38bdf8; margin: 10px 0; }
-    .card .value.green { color: #4ade80; }
-    .card .label { font-size: 24px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-    .card .subtext { font-size: 18px; color: #64748b; margin-top: 12px; }
+    /* Green top border stripe on cards */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: #88c542;
+    }
 
+    .card .icon { font-size: 64px; margin-bottom: 12px; }
+    .card .value { font-size: 66px; font-weight: 800; color: #0b2b3c; margin: 8px 0; }
+    .card .value.green { color: #88c542; }
+    .card .label { font-size: 22px; color: #0b2b3c; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .subtext { font-size: 17px; color: #5c727d; margin-top: 8px; font-weight: 500; }
+
+    /* Footer */
     .footer {
       text-align: center;
-      color: #64748b;
-      font-size: 20px;
+      color: #5c727d;
+      font-size: 18px;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>🎾 Halton Tennis Clean Energy</h1>
+    <div class="header-titles">
+      <h1>HALTON <span>PROJECT ZERO</span></h1>
+      <div class="subtitle">Halton Outdoor Centre Clean Energy Impact</div>
+    </div>
     <div class="status-badge">
       <span>●</span> Live Generation
     </div>
@@ -86,16 +133,16 @@
 
     <div class="card">
       <div class="icon">🌍</div>
-      <div class="value green" id="co2-saved">-- kg</div>
-      <div class="label">CO₂ Offset</div>
+      <div class="value green" id="co2-saved">71,243 kg</div>
+      <div class="label">CO₂ Reduction</div>
       <div class="subtext">Lifetime Environmental Benefit</div>
     </div>
 
     <div class="card">
       <div class="icon">🌲</div>
-      <div class="value green" id="trees-saved">--</div>
-      <div class="label">Trees Equivalent</div>
-      <div class="subtext">Planted Tree Impact</div>
+      <div class="value green" id="trees-saved">71,458</div>
+      <div class="label">Trees Planted Equivalent</div>
+      <div class="subtext">FoxCloud 1:1 Impact Metric</div>
     </div>
   </div>
 
@@ -103,62 +150,62 @@
     Live updates every 5 minutes • Halton Solar Array
   </div>
 
-<script>
-  const API_KEY = "ac6140ac-ab43-4eaa-b5e7-76934270c33e"; 
-  const DEVICE_SN = "603J3030447P009"; 
-  
-  // Set your lifetime solar generation (kWh) as fallback
-  const ESTIMATED_LIFETIME_KWH = 71458; 
+  <script>
+    const API_KEY = "ac6140ac-ab43-4eaa-b5e7-76934270c33e"; 
+    const DEVICE_SN = "603J3030447P009"; 
+    
+    // Lifetime fallback value matching your FoxCloud v2 dashboard
+    const ESTIMATED_LIFETIME_KWH = 71458; 
 
-  async function fetchFoxESSData() {
-    try {
-      const response = await fetch('https://www.foxesscloud.com/op/v1/device/real/query', {
-        method: 'POST',
-        headers: {
-          'token': API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "sn": DEVICE_SN })
-      });
+    async function fetchFoxESSData() {
+      try {
+        const response = await fetch('https://www.foxesscloud.com/op/v1/device/real/query', {
+          method: 'POST',
+          headers: {
+            'token': API_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ "sn": DEVICE_SN })
+        });
 
-      const data = await response.json();
-      
-      let todayYield = 21.80;
-      let pvPower = 14.7;
-      let totalYield = ESTIMATED_LIFETIME_KWH;
-
-      if (data && data.result && data.result.length > 0) {
-        const result = data.result[0];
+        const data = await response.json();
         
-        if (result.pvPower !== undefined) pvPower = result.pvPower;
-        if (result.todayYield !== undefined) todayYield = result.todayYield;
-        if (result.generationTotal || result.cumulateYield) {
-          totalYield = result.generationTotal || result.cumulateYield;
+        let todayYield = 21.80;
+        let pvPower = 14.7;
+        let totalYield = ESTIMATED_LIFETIME_KWH;
+
+        if (data && data.result && data.result.length > 0) {
+          const result = data.result[0];
+          
+          if (result.pvPower !== undefined) pvPower = result.pvPower;
+          if (result.todayYield !== undefined) todayYield = result.todayYield;
+          if (result.generationTotal || result.cumulateYield) {
+            totalYield = result.generationTotal || result.cumulateYield;
+          }
         }
+
+        // FoxCloud 1:1 Ratio Formulas
+        const co2Kg = Math.round(totalYield * 0.997);
+        const trees = co2Kg;
+
+        document.getElementById('pv-power').innerText = `${parseFloat(pvPower).toFixed(1)} kW`;
+        document.getElementById('daily-yield').innerText = `${parseFloat(todayYield).toFixed(2)} kWh Generated Today`;
+        document.getElementById('co2-saved').innerText = `${co2Kg.toLocaleString()} kg`;
+        document.getElementById('trees-saved').innerText = `${trees.toLocaleString()}`;
+
+      } catch (err) {
+        console.error('Updating with baseline values:', err);
+        
+        const co2Kg = Math.round(ESTIMATED_LIFETIME_KWH * 0.997);
+        const trees = co2Kg;
+
+        document.getElementById('co2-saved').innerText = `${co2Kg.toLocaleString()} kg`;
+        document.getElementById('trees-saved').innerText = `${trees.toLocaleString()}`;
       }
-
-      // FoxCloud 1:1 Ratio Formula
-      const co2Kg = Math.round(totalYield * 0.997);
-      const trees = co2Kg;
-
-      document.getElementById('pv-power').innerText = `${parseFloat(pvPower).toFixed(1)} kW`;
-      document.getElementById('daily-yield').innerText = `${parseFloat(todayYield).toFixed(2)} kWh Generated Today`;
-      document.getElementById('co2-saved').innerText = `${co2Kg.toLocaleString()} kg`;
-      document.getElementById('trees-saved').innerText = `${trees.toLocaleString()}`;
-
-    } catch (err) {
-      console.error('Updating with baseline values:', err);
-      
-      const co2Kg = Math.round(ESTIMATED_LIFETIME_KWH * 0.997);
-      const trees = co2Kg;
-
-      document.getElementById('co2-saved').innerText = `${co2Kg.toLocaleString()} kg`;
-      document.getElementById('trees-saved').innerText = `${trees.toLocaleString()}`;
     }
-  }
 
-  fetchFoxESSData();
-  setInterval(fetchFoxESSData, 300000); // Refresh every 5 minutes
-</script>
+    fetchFoxESSData();
+    setInterval(fetchFoxESSData, 300000); // 5 min auto-refresh
+  </script>
 </body>
 </html>
