@@ -150,12 +150,39 @@
     Live updates every 5 minutes • Halton Solar Array
   </div>
 
-  <script>
+<script>
     const API_KEY = "ac6140ac-ab43-4eaa-b5e7-76934270c33e"; 
     const DEVICE_SN = "603J3030447P009"; 
     
     // Lifetime fallback value matching your FoxCloud v2 dashboard
     const ESTIMATED_LIFETIME_KWH = 71458; 
+
+    // Smooth Count-Up Animation Function
+    function animateValue(id, start, end, duration, decimals = 0, suffix = '') {
+      const obj = document.getElementById(id);
+      if (!obj) return;
+      
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        
+        // Easing function for smooth deceleration at the end
+        const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+        const currentValue = start + easeOutProgress * (end - start);
+        
+        const formattedNum = decimals > 0 
+          ? currentValue.toFixed(decimals) 
+          : Math.round(currentValue).toLocaleString();
+          
+        obj.innerText = formattedNum + suffix;
+        
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
 
     async function fetchFoxESSData() {
       try {
@@ -188,10 +215,12 @@
         const co2Kg = Math.round(totalYield * 0.997);
         const trees = co2Kg;
 
-        document.getElementById('pv-power').innerText = `${parseFloat(pvPower).toFixed(1)} kW`;
+        // Trigger smooth count-up animations (duration: 1800ms / 1.8 seconds)
+        animateValue('pv-power', 0, parseFloat(pvPower), 1800, 1, ' kW');
+        animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
+        animateValue('trees-saved', 0, trees, 1800, 0, '');
+
         document.getElementById('daily-yield').innerText = `${parseFloat(todayYield).toFixed(2)} kWh Generated Today`;
-        document.getElementById('co2-saved').innerText = `${co2Kg.toLocaleString()} kg`;
-        document.getElementById('trees-saved').innerText = `${trees.toLocaleString()}`;
 
       } catch (err) {
         console.error('Updating with baseline values:', err);
@@ -199,13 +228,17 @@
         const co2Kg = Math.round(ESTIMATED_LIFETIME_KWH * 0.997);
         const trees = co2Kg;
 
-        document.getElementById('co2-saved').innerText = `${co2Kg.toLocaleString()} kg`;
-        document.getElementById('trees-saved').innerText = `${trees.toLocaleString()}`;
+        animateValue('pv-power', 0, 14.7, 1800, 1, ' kW');
+        animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
+        animateValue('trees-saved', 0, trees, 1800, 0, '');
       }
     }
 
+    // Run animation on page load
     fetchFoxESSData();
-    setInterval(fetchFoxESSData, 300000); // 5 min auto-refresh
+    
+    // Auto-refresh data every 5 minutes
+    setInterval(fetchFoxESSData, 300000);
   </script>
 </body>
 </html>
