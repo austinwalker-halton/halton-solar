@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Halton Outdoor Centre - Project Zero Dashboard</title>
-  <style>
+<style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
@@ -16,21 +16,21 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 3vh 4vw;
+      padding: 2.5vh 3vw;
       overflow: hidden;
     }
     
-    /* Header Section */
+    /* Header Section (12% Height) */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: #ffffff;
-      padding: 2.5vh 3vw;
-      border-radius: 20px;
+      padding: 0 3vw;
+      border-radius: 16px;
       box-shadow: 0 10px 30px rgba(11, 43, 60, 0.08);
       border-left: 12px solid #88c542;
-      height: 14vh;
+      height: 12vh;
     }
     
     .header-titles {
@@ -40,7 +40,7 @@
     }
     
     .header h1 { 
-      font-size: 5vh; 
+      font-size: 4vh; 
       font-weight: 900; 
       color: #0b2b3c; 
       letter-spacing: -0.5px;
@@ -48,34 +48,31 @@
       line-height: 1;
     }
     
-    .header h1 span {
-      color: #88c542;
-    }
+    .header h1 span { color: #88c542; }
     
     .header .subtitle {
-      font-size: 2.2vh;
+      font-size: 1.8vh;
       color: #5c727d;
       font-weight: 700;
-      margin-top: 0.8vh;
+      margin-top: 0.5vh;
     }
     
     .status-badge {
       background-color: #eaf6de;
       color: #4b801a;
       border: 3px solid #88c542;
-      padding: 1vh 2vw;
+      padding: 0.8vh 1.8vw;
       border-radius: 40px;
       font-weight: 800;
-      font-size: 2.2vh;
+      font-size: 2vh;
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    /* Pulsing Green Dot Animation */
     .pulse-dot {
-      width: 1.2vh;
-      height: 1.2vh;
+      width: 1vh;
+      height: 1vh;
       background-color: #4b801a;
       border-radius: 50%;
       display: inline-block;
@@ -83,39 +80,27 @@
     }
 
     @keyframes pulse {
-      0% {
-        transform: scale(0.95);
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(75, 128, 26, 0.7);
-      }
-      70% {
-        transform: scale(1.1);
-        opacity: 0.8;
-        box-shadow: 0 0 0 10px rgba(75, 128, 26, 0);
-      }
-      100% {
-        transform: scale(0.95);
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(75, 128, 26, 0);
-      }
+      0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(75, 128, 26, 0.7); }
+      70% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 8px rgba(75, 128, 26, 0); }
+      100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(75, 128, 26, 0); }
     }
-    
-    /* Cards Grid */
+
+    /* Cards Grid (56% Height) */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 3vw;
-      height: 72vh;
-      margin: 2vh 0;
+      gap: 2vw;
+      height: 56vh;
+      width: 100%;
     }
 
     .card {
       background: #ffffff;
-      border-radius: 24px;
-      padding: 4vh 2vw;
+      border-radius: 20px;
+      padding: 3vh 1.5vw;
       text-align: center;
       border: 2px solid #e1e8ed;
-      box-shadow: 0 15px 35px rgba(11, 43, 60, 0.06);
+      box-shadow: 0 12px 28px rgba(11, 43, 60, 0.06);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -127,110 +112,63 @@
     .card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 8px;
+      top: 0; left: 0; right: 0;
+      height: 6px;
       background: #88c542;
     }
 
-    /* SVG Icon Styling */
     .card .svg-icon {
-      width: 10vh;
-      height: 10vh;
+      width: 8vh;
+      height: 8vh;
       fill: #88c542;
     }
     
-    .card .svg-icon.sun {
-      fill: #f59e0b;
-    }
+    .card .svg-icon.sun { fill: #f59e0b; }
 
     .card .value { 
-      font-size: 8vh; 
+      font-size: 6.5vh; 
       font-weight: 900; 
       color: #0b2b3c; 
       line-height: 1;
-      margin: 1vh 0;
     }
     
-    .card .value.green { 
-      color: #88c542; 
-    }
-    
-    .card .label { 
-      font-size: 3.2vh; 
-      color: #0b2b3c; 
-      font-weight: 800; 
-      text-transform: uppercase; 
-      letter-spacing: 0.5px; 
-    }
-    
-    .card .subtext { 
-      font-size: 2.3vh; 
-      color: #5c727d; 
-      font-weight: 600; 
-    }
+    .card .value.green { color: #88c542; }
+    .card .label { font-size: 2.5vh; color: #0b2b3c; font-weight: 800; text-transform: uppercase; }
+    .card .subtext { font-size: 1.8vh; color: #5c727d; font-weight: 600; margin-top: 0.4vh; }
 
-    /* Bottom Info Banner */
-/* Full-Width Bottom Banner - Matches Top Title Box */
+    /* Info Banner Section (14% Height) */
     .info-banner {
       width: 100%;
+      height: 14vh;
       background: #ffffff;
-      border-radius: 20px;
-      padding: 2vh 3vw;
+      border-radius: 16px;
+      padding: 0 3vw;
       box-shadow: 0 10px 30px rgba(11, 43, 60, 0.08);
       border-left: 12px solid #88c542;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      height: 12vh;
-      margin-top: 1vh;
     }
 
     .info-item {
       display: flex;
       align-items: center;
-      gap: 14px;
-      font-size: 2.2vh;
-      font-weight: 700;
-      color: #0b2b3c;
+      gap: 12px;
     }
 
-    .info-item .icon-badge {
-      font-size: 3vh;
-    }
+    .info-item .icon-badge { font-size: 2.8vh; }
+    .info-item .text-group { display: flex; flex-direction: column; }
+    .info-item .title { color: #88c542; font-weight: 900; text-transform: uppercase; font-size: 1.8vh; }
+    .info-item .desc { color: #5c727d; font-weight: 600; font-size: 1.8vh; }
+    .info-divider { width: 2px; height: 5vh; background-color: #e1e8ed; }
 
-    .info-item .text-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .info-item .title {
-      color: #88c542;
-      font-weight: 900;
-      text-transform: uppercase;
-      font-size: 2vh;
-      letter-spacing: 0.5px;
-    }
-
-    .info-item .desc {
-      color: #5c727d;
-      font-weight: 600;
-      font-size: 2vh;
-    }
-
-    .info-divider {
-      width: 2px;
-      height: 5vh;
-      background-color: #e1e8ed;
-    }
-    /* Footer */
+    /* Footer (3% Height) */
     .footer {
       text-align: center;
       color: #5c727d;
-      font-size: 2vh;
+      font-size: 1.6vh;
       font-weight: 700;
-      height: 4vh;
+      height: 3vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -239,6 +177,7 @@
 </head>
 <body>
 
+<!-- Header -->
   <div class="header">
     <div class="header-titles">
       <h1>HALTON <span>PROJECT ZERO</span></h1>
@@ -249,6 +188,7 @@
     </div>
   </div>
 
+  <!-- Main Cards -->
   <div class="grid">
     <div class="card">
       <svg class="svg-icon sun" viewBox="0 0 24 24">
@@ -272,19 +212,19 @@
       </div>
     </div>
 
-<div class="card">
+    <div class="card">
       <svg class="svg-icon" viewBox="0 0 24 24">
         <path d="M10 21h4v-3h-4v3zm11-12h-4.26l2.12-4.24a1 1 0 0 0-.89-1.45H5.03a1 1 0 0 0-.89 1.45L6.26 9H2a1 1 0 0 0-.8 1.6L6 16h12l4.8-5.4A1 1 0 0 0 21 9z"/>
       </svg>
-      <div class="value green" id="trees-saved">71,244</div>
+      <div class="value green" id="trees-saved">0</div>
       <div>
         <div class="label">Trees Planted</div>
         <div class="subtext">Equivalent</div>
       </div>
     </div>
+  </div>
 
-<!-- Info Banner -->
-  <!-- Full-Width Bottom Banner -->
+  <!-- Info Banner -->
   <div class="info-banner">
     <div class="info-item">
       <span class="icon-badge">🔋</span>
@@ -305,6 +245,7 @@
     </div>
   </div>
 
+  <!-- Footer -->
   <div class="footer">
     Live updates every 5 minutes • Halton Solar Array
   </div>
