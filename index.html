@@ -172,35 +172,56 @@
     }
 
     /* Bottom Info Banner */
+/* Full-Width Bottom Banner - Matches Top Title Box */
     .info-banner {
+      width: 100%;
       background: #ffffff;
-      border-radius: 16px;
-      padding: 1.5vh 2vw;
-      box-shadow: 0 8px 20px rgba(11, 43, 60, 0.05);
-      border: 1px solid #e1e8ed;
+      border-radius: 20px;
+      padding: 2vh 3vw;
+      box-shadow: 0 10px 30px rgba(11, 43, 60, 0.08);
+      border-left: 12px solid #88c542;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      margin-bottom: 1.5vh;
+      height: 12vh;
+      margin-top: 1vh;
     }
 
     .info-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 1.8vh;
+      gap: 14px;
+      font-size: 2.2vh;
       font-weight: 700;
       color: #0b2b3c;
     }
 
-    .info-item span.highlight {
+    .info-item .icon-badge {
+      font-size: 3vh;
+    }
+
+    .info-item .text-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-item .title {
       color: #88c542;
-      font-weight: 800;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 2vh;
+      letter-spacing: 0.5px;
+    }
+
+    .info-item .desc {
+      color: #5c727d;
+      font-weight: 600;
+      font-size: 2vh;
     }
 
     .info-divider {
       width: 2px;
-      height: 3vh;
+      height: 5vh;
       background-color: #e1e8ed;
     }
     /* Footer */
@@ -263,13 +284,24 @@
     </div>
 
 <!-- Info Banner -->
+  <!-- Full-Width Bottom Banner -->
   <div class="info-banner">
     <div class="info-item">
-      🔋 <span>On-Site Battery Storage</span> Storing excess clean power for peak use
+      <span class="icon-badge">🔋</span>
+      <div class="text-group">
+        <span class="title">On-Site Battery Storage</span>
+        <span class="desc">Storing excess clean energy for peak power use</span>
+      </div>
     </div>
+
     <div class="info-divider"></div>
+
     <div class="info-item">
-      ☀️ <span>Expansion Plans</span> Adding 90 additional solar panels soon
+      <span class="icon-badge">☀️</span>
+      <div class="text-group">
+        <span class="title">Expansion Plans</span>
+        <span class="desc">Adding 90 additional solar panels to the array soon</span>
+      </div>
     </div>
   </div>
 
