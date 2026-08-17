@@ -236,10 +236,7 @@
 
 <script>
     const API_KEY = "ac6140ac-ab43-4eaa-b5e7-76934270c33e"; 
-    const DEVICE_SN = "603J3030447P009"; 
-    
-    // Baseline lifetime generation fallback (kWh)
-    const ESTIMATED_LIFETIME_KWH = 71458; 
+    const PLANT_ID = "3b651e78-9da6-43e1-a639-b76ca0c90bc5"; 
 
     // Smooth count-up animation function
     function animateValue(id, start, end, duration, decimals = 0, suffix = '') {
@@ -268,32 +265,30 @@
 
     async function fetchFoxESSData() {
       try {
-        const response = await fetch('https://www.foxesscloud.com/op/v1/device/real/query', {
+        // Query FoxESS API for plant overview
+        const response = await fetch('https://www.foxesscloud.com/op/v1/plant/detail', {
           method: 'POST',
           headers: {
             'token': API_KEY,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ "sn": DEVICE_SN })
+          body: JSON.stringify({ "id": PLANT_ID })
         });
 
         const data = await response.json();
         
-        let todayYield = 21.80;
-        let pvPower = 14.7;
-        let totalYield = ESTIMATED_LIFETIME_KWH;
+        let todayYield = 32.50;
+        let pvPower = 16.5;
+        let totalYield = 71920; 
 
-        if (data && data.result && data.result.length > 0) {
-          const result = data.result[0];
-          
-          if (result.pvPower !== undefined) pvPower = result.pvPower;
-          if (result.todayYield !== undefined) todayYield = result.todayYield;
-          if (result.generationTotal || result.cumulateYield) {
-            totalYield = result.generationTotal || result.cumulateYield;
-          }
+        if (data && data.result) {
+          const res = data.result;
+          if (res.power !== undefined) pvPower = res.power;
+          if (res.todayYield !== undefined) todayYield = res.todayYield;
+          if (res.cumulateYield !== undefined) totalYield = res.cumulateYield;
         }
 
-        // Distinct FoxCloud Ratios
+        // Distinct FoxCloud Ratios matching portal
         const co2Kg = Math.round(totalYield * 0.997);
         const trees = Math.round(totalYield * 1.0003);
 
@@ -306,17 +301,17 @@
       } catch (err) {
         console.error('Updating with baseline values:', err);
         
-        // Baseline distinct calculations
-        const co2Kg = Math.round(ESTIMATED_LIFETIME_KWH * 0.997);
-        const trees = Math.round(ESTIMATED_LIFETIME_KWH * 1.0003);
+        const fallbackTotal = 71920;
+        const co2Kg = Math.round(fallbackTotal * 0.997);
+        const trees = Math.round(fallbackTotal * 1.0003);
 
-        animateValue('pv-power', 0, 14.7, 1800, 1, ' kW');
+        animateValue('pv-power', 0, 16.5, 1800, 1, ' kW');
         animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
         animateValue('trees-saved', 0, trees, 1800, 0, '');
       }
     }
 
-    // Run animation on page load
+    // Run animation on load
     fetchFoxESSData();
     
     // Auto-refresh every 5 minutes
