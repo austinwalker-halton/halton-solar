@@ -171,6 +171,38 @@
       font-weight: 600; 
     }
 
+    /* Bottom Info Banner */
+    .info-banner {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.5vh 2vw;
+      box-shadow: 0 8px 20px rgba(11, 43, 60, 0.05);
+      border: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 1.5vh;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.8vh;
+      font-weight: 700;
+      color: #0b2b3c;
+    }
+
+    .info-item span.highlight {
+      color: #88c542;
+      font-weight: 800;
+    }
+
+    .info-divider {
+      width: 2px;
+      height: 3vh;
+      background-color: #e1e8ed;
+    }
     /* Footer */
     .footer {
       text-align: center;
@@ -229,6 +261,17 @@
         <div class="subtext">Equivalent</div>
       </div>
     </div>
+
+<!-- Info Banner -->
+  <div class="info-banner">
+    <div class="info-item">
+      🔋 <span>On-Site Battery Storage</span> Storing excess clean power for peak use
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-item">
+      ☀️ <span>Expansion Plans</span> Adding 90 additional solar panels soon
+    </div>
+  </div>
 
   <div class="footer">
     Live updates every 5 minutes • Halton Solar Array
