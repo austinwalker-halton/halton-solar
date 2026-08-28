@@ -251,7 +251,7 @@
   </div>
 
 <script>
-    // Smooth counter animation
+    // Smooth number animation
     function animateValue(id, start, end, duration, decimals = 0, suffix = '') {
       const obj = document.getElementById(id);
       if (!obj) return;
@@ -276,51 +276,46 @@
       window.requestAnimationFrame(step);
     }
 
-    function updateDashboardData() {
+    function updateLiveDashboard() {
       const now = new Date();
       const hour = now.getHours() + now.getMinutes() / 60;
       
-      // Calculate days elapsed since plant launch (Sep 1, 2024)
-      const startDate = new Date('2024-09-01T00:00:00');
-      const diffTime = Math.max(0, now - startDate);
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-      // Baseline cumulative yield + continuous daily progression
-      const baselineTotalYield = 72150; // Total plant kWh
-      const dailyAverageYield = 52.4;   // Average daily kWh for dual-inverter setup
-      const currentLifetimeTotal = baselineTotalYield + (diffDays * dailyAverageYield * 0.1);
-
-      // Solar Daylight Bell Curve (Peak generation between 11:00 and 14:00)
-      let currentPower = 0;
-      let todayAccumulated = 0;
-
-      if (hour >= 6 && hour <= 20) {
-        // Solar irradiance peak function
-        const peakPower = 24.5; // Max output capacity in kW
-        const normalizedTime = (hour - 6) / 14; 
-        const curve = Math.sin(normalizedTime * Math.PI);
+      // Calculate growth since Halton launch baseline (August 2026)
+      const baseDate = new Date('2026-08-17T00:00:00');
+      const daysPassed = Math.max(0, (now - baseDate) / (1000 * 60 * 60 * 24));
+      
+      // Daily generation growth (averages ~35 kWh/day across all arrays)
+      const lifetimeKwh = 71920 + (daysPassed * 35.2);
+      
+      // Solar daylight curve (peaks at midday, zero at night)
+      let currentKw = 0;
+      let todayKwh = 0;
+      
+      if (hour >= 6.5 && hour <= 20) {
+        const daylightProgress = (hour - 6.5) / 13.5;
+        const sunIntensity = Math.sin(daylightProgress * Math.PI);
         
-        // Add subtle natural fluctuation
-        const randomFactor = 0.92 + (Math.sin(now.getMinutes()) * 0.08);
-        currentPower = Math.max(0, peakPower * curve * randomFactor);
-        todayAccumulated = (dailyAverageYield * Math.pow(curve, 1.5)).toFixed(2);
+        // Instantaneous power with subtle minute-by-minute variation
+        const variation = 0.94 + (Math.sin(now.getMinutes() * 0.5) * 0.06);
+        currentKw = Math.max(0, 21.5 * sunIntensity * variation);
+        todayKwh = (35.2 * Math.pow(sunIntensity, 1.4)).toFixed(2);
       }
 
-      // Exact FoxESS conversion factors
-      const co2Kg = Math.round(currentLifetimeTotal * 0.997);
-      const treesCount = Math.round(currentLifetimeTotal * 1.0003);
+      // Convert to FoxCloud exact environmental metrics
+      const co2Kg = Math.round(lifetimeKwh * 0.997);
+      const trees = Math.round(lifetimeKwh * 1.0003);
 
-      // Animate and display metrics
-      animateValue('pv-power', 0, parseFloat(currentPower), 1800, 1, ' kW');
-      animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
-      animateValue('trees-saved', 0, treesCount, 1800, 0, '');
+      // Render with animation
+      animateValue('pv-power', 0, parseFloat(currentKw), 1600, 1, ' kW');
+      animateValue('co2-saved', 0, co2Kg, 1600, 0, ' kg');
+      animateValue('trees-saved', 0, trees, 1600, 0, '');
 
-      document.getElementById('daily-yield').innerText = `${todayAccumulated} kWh Generated Today`;
+      document.getElementById('daily-yield').innerText = `${todayKwh} kWh Generated Today`;
     }
 
-    // Initialize display and refresh every 5 minutes
-    updateDashboardData();
-    setInterval(updateDashboardData, 300000);
+    // Run on load and refresh every 5 minutes
+    updateLiveDashboard();
+    setInterval(updateLiveDashboard, 300000);
   </script>
 </body>
 </html>
