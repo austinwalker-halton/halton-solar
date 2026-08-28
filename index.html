@@ -279,10 +279,12 @@
       window.requestAnimationFrame(step);
     }
 
-    async function fetchFoxESSData() {
+async function fetchFoxESSData() {
       try {
-        // Query FoxESS API for plant overview
-        const response = await fetch('https://www.foxesscloud.com/op/v1/plant/detail', {
+        const targetUrl = 'https://www.foxesscloud.com/op/v1/plant/detail';
+        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: {
             'token': API_KEY,
@@ -293,8 +295,8 @@
 
         const data = await response.json();
         
-        let todayYield = 32.50;
-        let pvPower = 16.5;
+        let todayYield = 0;
+        let pvPower = 0;
         let totalYield = 71920; 
 
         if (data && data.result) {
@@ -304,7 +306,6 @@
           if (res.cumulateYield !== undefined) totalYield = res.cumulateYield;
         }
 
-        // Distinct FoxCloud Ratios matching portal
         const co2Kg = Math.round(totalYield * 0.997);
         const trees = Math.round(totalYield * 1.0003);
 
@@ -316,14 +317,6 @@
 
       } catch (err) {
         console.error('Updating with baseline values:', err);
-        
-        const fallbackTotal = 71920;
-        const co2Kg = Math.round(fallbackTotal * 0.997);
-        const trees = Math.round(fallbackTotal * 1.0003);
-
-        animateValue('pv-power', 0, 16.5, 1800, 1, ' kW');
-        animateValue('co2-saved', 0, co2Kg, 1800, 0, ' kg');
-        animateValue('trees-saved', 0, trees, 1800, 0, '');
       }
     }
 
