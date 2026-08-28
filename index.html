@@ -281,8 +281,8 @@
 
 async function fetchFoxESSData() {
       try {
-        const targetUrl = 'https://www.foxesscloud.com/op/v1/plant/detail';
-        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+        const apiUrl = 'https://www.foxesscloud.com/op/v1/plant/detail';
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(apiUrl);
 
         const response = await fetch(proxyUrl, {
           method: 'POST',
@@ -293,8 +293,13 @@ async function fetchFoxESSData() {
           body: JSON.stringify({ "id": PLANT_ID })
         });
 
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        
+        console.log('FoxESS Response:', data);
+
         let todayYield = 0;
         let pvPower = 0;
         let totalYield = 71920; 
@@ -316,7 +321,7 @@ async function fetchFoxESSData() {
         document.getElementById('daily-yield').innerText = `${parseFloat(todayYield).toFixed(2)} kWh Generated Today`;
 
       } catch (err) {
-        console.error('Updating with baseline values:', err);
+        console.error('API Error details:', err);
       }
     }
 
