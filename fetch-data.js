@@ -5,7 +5,7 @@ const API_KEY = process.env.FOX_API_KEY;
 const BASE_URL = 'https://www.foxesscloud.com';
 
 function getSignature(path, timestamp) {
-  const text = `${path}\r\n${API_KEY}\r\n${timestamp}`;
+  const text = `${path}\\r\\n${API_KEY}\\r\\n${timestamp}`;
   return crypto.createHash('md5').update(text).digest('hex');
 }
 
@@ -30,38 +30,64 @@ async function foxRequest(path, body = {}) {
 
 async function run() {
   try {
-    // 1. Get plant list
-    const plantListRes = await foxRequest('/op/v0/plant/list', { pageIndex: 1, pageSize: 10 });
-    const plants = plantListRes?.result?.data || [];
-    
-    if (plants.length === 0) {
-      throw new Error('No plants found on this Fox ESS account.');
+    // Query devices directly
+    const deviceRes = await foxRequest('/op/v0/device/list', { currentPage: 1, pageSize: 10 });
+    console.log('Device List:', JSON.stringify(deviceRes));
+
+    const devices = deviceRes?.result?.data || [];
+    const sns = devices.length > 0 
+      ? devices.map(d => d.deviceSN) 
+      : ['608M4240547F116', '608M4240547F081'];
+
+    let totalPower = 0;
+    let totalTodayGeneration = 0;
+    let totalCumulate = 0;
+
+    for (const sn of sns) {
+      // 1. Instantaneous power
+      const realRes = await foxRequest('/op/v0/device/real/query', {
+        sn: sn,
+        variables: ['pvPower', 'generationToday', 'cumulate']
+      });
+      console.log(`Real Query for ${sn}:`, JSON.stringify(realRes));
+
+      const datas = realRes?.result?.[0]?.datas || [];
+      for (const item of datas) {
+        if (item.variable === 'pvPower') totalPower += Number(item.value || 0);
+        if (item.variable === 'generationToday') totalTodayGeneration += Number(item.value || 0);
+        if (item.variable === 'cumulate') totalCumulate += Number(item.value || 0);
+      }
+
+      // 2. Generation summary fallback if cumulate is in report endpoint
+      const genRes = await foxRequest('/op/v0/device/generation', { sn: sn });
+      console.log(`Gen Query for ${sn}:`, JSON.stringify(genRes));
+      if (genRes?.result) {
+        if (genRes.result.today && totalTodayGeneration === 0) {
+          totalTodayGeneration += Number(genRes.result.today || 0);
+        }
+        if (genRes.result.cumulate) {
+          totalCumulate += Number(genRes.result.cumulate || 0);
+        }
+      }
     }
 
-    const plant = plants[0];
-    const plantId = plant.plantID;
-
-    // 2. Fetch realtime power and daily production
-    const realRes = await foxRequest('/op/v0/plant/getPlantReal', { plantID: plantId });
-    const realData = realRes?.result || {};
-
-    // 3. Fetch cumulative generation and environmental impact
-    const totalRes = await foxRequest('/op/v0/plant/getPlantGeneration', { plantID: plantId });
-    const totalData = totalRes?.result || {};
+    // Environmental metrics matching Fox ESS constants (~1.0 kg/kWh and ~1.003 trees/kg)
+    const co2Kg = Math.round(totalCumulate * 0.997);
+    const trees = Math.round(co2Kg * 1.003);
 
     const output = {
-      currentKw: Number(realData.power || 0),
-      todayKwh: Number(realData.todayGeneration || 0),
-      lifetimeKwh: Number(totalData.cumulate || 0),
-      co2ReductionKg: Number(totalData.trees || totalData.co2Reduction || Math.round((totalData.cumulate || 0) * 0.997)),
-      treesPlanted: Number(totalData.treesPlanted || Math.round((totalData.cumulate || 0) * 1.0003)),
+      currentKw: Number(totalPower.toFixed(1)),
+      todayKwh: Number(totalTodayGeneration.toFixed(2)),
+      lifetimeKwh: Math.round(totalCumulate),
+      co2ReductionKg: co2Kg,
+      treesPlanted: trees,
       updatedAt: new Date().toISOString()
     };
 
     fs.writeFileSync('data.json', JSON.stringify(output, null, 2));
-    console.log('Successfully updated data.json:', output);
+    console.log('Resulting data.json:', output);
   } catch (err) {
-    console.error('Error fetching Fox ESS data:', err);
+    console.error('Fatal fetch error:', err);
     process.exit(1);
   }
 }
