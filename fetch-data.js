@@ -5,75 +5,78 @@ const API_KEY = process.env.FOX_API_KEY;
 const BASE_URL = 'https://www.foxesscloud.com';
 
 function getSignature(path, timestamp) {
-  const text = `${path}\\r\\n${API_KEY}\\r\\n${timestamp}`;
+  const text = `${path}\r\n${API_KEY}\r\n${timestamp}`;
   return crypto.createHash('md5').update(text).digest('hex');
 }
 
-async function foxRequest(path, body = {}) {
+async function foxRequest(path, params = {}, method = 'POST') {
   const timestamp = Date.now().toString();
   const signature = getSignature(path, timestamp);
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'token': API_KEY,
-      'timestamp': timestamp,
-      'signature': signature,
-      'lang': 'en'
-    },
-    body: JSON.stringify(body)
-  });
+  const headers = {
+    'token': API_KEY,
+    'timestamp': timestamp,
+    'signature': signature,
+    'lang': 'en'
+  };
 
+  let url = `${BASE_URL}${path}`;
+  const options = { method, headers };
+
+  if (method === 'POST') {
+    headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(params);
+  } else if (method === 'GET' && Object.keys(params).length > 0) {
+    const qs = new URLSearchParams(params).toString();
+    url = `${url}?${qs}`;
+  }
+
+  const res = await fetch(url, options);
   return await res.json();
 }
 
 async function run() {
   try {
-    // Query devices directly
+    // 1. Get Device List
     const deviceRes = await foxRequest('/op/v0/device/list', { currentPage: 1, pageSize: 10 });
-    console.log('Device List:', JSON.stringify(deviceRes));
-
     const devices = deviceRes?.result?.data || [];
-    const sns = devices.length > 0 
-      ? devices.map(d => d.deviceSN) 
-      : ['608M4240547F116', '608M4240547F081'];
+    
+    if (devices.length === 0) {
+      throw new Error('No devices returned from Fox ESS.');
+    }
 
     let totalPower = 0;
     let totalTodayGeneration = 0;
     let totalCumulate = 0;
 
-    for (const sn of sns) {
-      // 1. Instantaneous power
+    for (const dev of devices) {
+      const sn = dev.deviceSN;
+
+      // Realtime instantaneous PV Power
       const realRes = await foxRequest('/op/v0/device/real/query', {
         sn: sn,
-        variables: ['pvPower', 'generationToday', 'cumulate']
-      });
-      console.log(`Real Query for ${sn}:`, JSON.stringify(realRes));
+        variables: ['pvPower']
+      }, 'POST');
 
       const datas = realRes?.result?.[0]?.datas || [];
-      for (const item of datas) {
-        if (item.variable === 'pvPower') totalPower += Number(item.value || 0);
-        if (item.variable === 'generationToday') totalTodayGeneration += Number(item.value || 0);
-        if (item.variable === 'cumulate') totalCumulate += Number(item.value || 0);
+      const pvItem = datas.find(d => d.variable === 'pvPower');
+      if (pvItem) {
+        totalPower += Number(pvItem.value || 0);
       }
 
-      // 2. Generation summary fallback if cumulate is in report endpoint
-      const genRes = await foxRequest('/op/v0/device/generation', { sn: sn });
-      console.log(`Gen Query for ${sn}:`, JSON.stringify(genRes));
+      // Generation totals (Requires GET query with sn)
+      const genRes = await foxRequest('/op/v0/device/generation', { sn: sn }, 'GET');
+      console.log(`Gen Result for ${sn}:`, JSON.stringify(genRes));
+
       if (genRes?.result) {
-        if (genRes.result.today && totalTodayGeneration === 0) {
-          totalTodayGeneration += Number(genRes.result.today || 0);
-        }
-        if (genRes.result.cumulate) {
-          totalCumulate += Number(genRes.result.cumulate || 0);
-        }
+        totalTodayGeneration += Number(genRes.result.today || 0);
+        totalCumulate += Number(genRes.result.cumulate || 0);
       }
     }
 
-    // Environmental metrics matching Fox ESS constants (~1.0 kg/kWh and ~1.003 trees/kg)
+    // Fox ESS environmental conversions: ~0.997 for CO2 and ~1.003 for Trees
     const co2Kg = Math.round(totalCumulate * 0.997);
-    const trees = Math.round(co2Kg * 1.003);
+    const trees = Math.round(totalCumulate * 1.003);
 
     const output = {
       currentKw: Number(totalPower.toFixed(1)),
@@ -85,7 +88,7 @@ async function run() {
     };
 
     fs.writeFileSync('data.json', JSON.stringify(output, null, 2));
-    console.log('Resulting data.json:', output);
+    console.log('Updated data.json successfully:', output);
   } catch (err) {
     console.error('Fatal fetch error:', err);
     process.exit(1);
