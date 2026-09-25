@@ -276,46 +276,28 @@
       window.requestAnimationFrame(step);
     }
 
-    function updateLiveDashboard() {
-      const now = new Date();
-      const hour = now.getHours() + now.getMinutes() / 60;
-      
-      // Calculate growth since Halton launch baseline (August 2026)
-      const baseDate = new Date('2026-08-17T00:00:00');
-      const daysPassed = Math.max(0, (now - baseDate) / (1000 * 60 * 60 * 24));
-      
-      // Daily generation growth (averages ~35 kWh/day across all arrays)
-      const lifetimeKwh = 71920 + (daysPassed * 35.2);
-      
-      // Solar daylight curve (peaks at midday, zero at night)
-      let currentKw = 0;
-      let todayKwh = 0;
-      
-      if (hour >= 6.5 && hour <= 20) {
-        const daylightProgress = (hour - 6.5) / 13.5;
-        const sunIntensity = Math.sin(daylightProgress * Math.PI);
+    async function updateLiveDashboard() {
+      try {
+        // Fetch data.json with cache buster
+        const response = await fetch(`data.json?t=${Date.now()}`);
+        if (!response.ok) throw new Error('data.json not found');
         
-        // Instantaneous power with subtle minute-by-minute variation
-        const variation = 0.94 + (Math.sin(now.getMinutes() * 0.5) * 0.06);
-        currentKw = Math.max(0, 21.5 * sunIntensity * variation);
-        todayKwh = (35.2 * Math.pow(sunIntensity, 1.4)).toFixed(2);
+        const data = await response.json();
+
+        // Animate live values from Fox ESS
+        animateValue('pv-power', 0, data.currentKw, 1200, 1, ' kW');
+        animateValue('co2-saved', 0, data.co2ReductionKg, 1200, 0, ' kg');
+        animateValue('trees-saved', 0, data.treesPlanted, 1200, 0, '');
+
+        document.getElementById('daily-yield').innerText = `${Number(data.todayKwh).toFixed(2)} kWh Generated Today`;
+      } catch (error) {
+        console.warn('Could not load data.json:', error);
       }
-
-      // Convert to FoxCloud exact environmental metrics
-      const co2Kg = Math.round(lifetimeKwh * 0.997);
-      const trees = Math.round(lifetimeKwh * 1.0003);
-
-      // Render with animation
-      animateValue('pv-power', 0, parseFloat(currentKw), 1600, 1, ' kW');
-      animateValue('co2-saved', 0, co2Kg, 1600, 0, ' kg');
-      animateValue('trees-saved', 0, trees, 1600, 0, '');
-
-      document.getElementById('daily-yield').innerText = `${todayKwh} kWh Generated Today`;
     }
 
-    // Run on load and refresh every 5 minutes
+    // Run on load and poll every 60 seconds
     updateLiveDashboard();
-    setInterval(updateLiveDashboard, 300000);
+    setInterval(updateLiveDashboard, 60000);
   </script>
 </body>
 </html>
