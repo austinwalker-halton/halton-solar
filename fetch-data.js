@@ -70,7 +70,7 @@ async function run() {
 
       if (genRes?.result) {
         totalTodayGeneration += Number(genRes.result.today || 0);
-        totalCumulate += Number(genRes.result.cumulate || 0);
+        totalCumulate += Number(genRes.result.cumulative || genRes.result.cumulate || 0);
       }
     }
 
