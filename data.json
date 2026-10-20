@@ -1,8 +1,8 @@
 {
-  "currentKw": 0.4,
-  "todayKwh": 47.4,
+  "currentKw": 0,
+  "todayKwh": 47.8,
   "lifetimeKwh": 80145,
-  "co2ReductionKg": 79904,
-  "treesPlanted": 80385,
-  "updatedAt": "2026-10-20T15:11:27.468Z"
+  "co2ReductionKg": 79905,
+  "treesPlanted": 80386,
+  "updatedAt": "2026-10-20T19:22:54.209Z"
 }
